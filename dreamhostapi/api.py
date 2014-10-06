@@ -1,7 +1,20 @@
+import ssl
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
 import uuid
 
 from dreamhostapi.module import Module
+
+
+class SSL3HTTPAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(
+            num_pools=connections,
+            maxsize=maxsize,
+            block=block,
+            ssl_version=ssl.PROTOCOL_SSLv3
+        )
 
 
 class DreamHostAPI(object):
@@ -10,6 +23,7 @@ class DreamHostAPI(object):
     def __init__(self, key):
         self.key = key
         self.session = requests.Session()
+        self.session.mount(self.API_URL, SSL3HTTPAdapter())
 
     def __getattr__(self, module_name):
         if module_name.startswith('__'):
