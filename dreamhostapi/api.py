@@ -9,6 +9,7 @@ class DreamHostAPI(object):
 
     def __init__(self, key):
         self.key = key
+        self.session = requests.Session()
 
     def __getattr__(self, module_name):
         if module_name.startswith('__'):
@@ -31,7 +32,7 @@ class DreamHostAPI(object):
             'format': 'json',
         })
 
-        http_response = requests.get(self.API_URL, params=params)
+        http_response = self.session.get(self.API_URL, params=params)
 
         # Something's very wrong if we don't get a 200 OK
         if http_response.status_code != requests.codes.ok:
